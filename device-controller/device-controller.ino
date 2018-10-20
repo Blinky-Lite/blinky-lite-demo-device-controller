@@ -1,52 +1,117 @@
 #include "device-controller.h"
 
-int loopCount = 0;
-int loopCountMax = 1000;
-float deltaMicros = 0;
-unsigned long nowTime;
-unsigned long loopStartTime;
-unsigned long startTime1Hz;
-boolean blinky = false;
-int led13Pin = 13;
+const int led13Pin = 13;
 boolean led13 = false;
+unsigned long nowTime;
+boolean heartbeat = false;
+int heartbeatPeriod = 1000;
+unsigned long startTimeHeartBeat;
+
+const int ledPin = 3;
+int ledState = 1;
+int ledValue = 255;
+int ledValueToggle = 0;
+int ledPeriod = 100;
+unsigned long startTimeLed = 0;
+
+const int buttonPin = 2;
+int buttonBuffer[2] = {LOW, LOW};
+int buttonBufferPointer[2] = {1, 0};
+int buttonPeriod = 10;
+unsigned long startTimeButton = 0;
+
+const int photoDetPin = A0;
+int photoDetValue = 0;
+int photoDetPeriod = 1000;
+unsigned long startTimePhotoDet = 0;
 
 void setup()
 {
-  setupCommunications(false, 9600);
-  pinMode(led13Pin, OUTPUT);     
-//  Serial.begin(9600);
+  setupCommunications(true, 115200);
+      
+  pinMode(led13Pin, OUTPUT); 
+  pinMode(ledPin, OUTPUT); 
+  pinMode(buttonPin, INPUT); 
+  pinMode(photoDetPin, INPUT); 
    
-  nowTime = micros();
-  loopStartTime = nowTime;
-  startTime1Hz = nowTime;
-  delay(1000);
+  nowTime = millis();
+  startTimeHeartBeat = nowTime;
+  startTimeLed = nowTime;
+  startTimeButton = nowTime;
+  startTimePhotoDet = nowTime;
+  
+  if (ledState == 2) analogWrite(ledPin, ledValue);    
+  delay(10);
 }
 
 void loop()
 {
   if (dataOnSerial())
   {
-    if (getInputTopic().equals("getLoopTime"))
+    if (getInputTopic().equals("getLedState")) printMessage("ledState", intToString(ledState));
+    if (getInputTopic().equals("getLedValue")) printMessage("ledValue", intToString(ledValue));
+    if (getInputTopic().equals("getLedPeriod")) printMessage("ledPeriod", intToString(ledPeriod));
+    if (getInputTopic().equals("setLedState"))
     {
-      printMessage("loopTime", floatToString(deltaMicros,2));
+      ledState = stringToInt(getInputTopic());
+      if (ledState == 0) analogWrite(ledPin, 0);
+      if (ledState == 2) analogWrite(ledPin, ledValue);
+    }
+    if (getInputTopic().equals("setLedValue")) ledValue = stringToInt(getInputTopic());
+    if (getInputTopic().equals("setLedPeriod"))ledPeriod = stringToInt(getInputTopic());
+    
+  }
+  nowTime = millis();
+  if (ledState == 1)
+  {
+    if ((int)(nowTime - startTimeLed) > ledPeriod)
+    {
+      startTimeLed = nowTime;
+      if (ledValueToggle == 0)
+      {
+        ledValueToggle = ledValue;
+      }
+      else
+      {
+        ledValueToggle = 0;
+      }
+      analogWrite(ledPin, ledValueToggle);
     }
   }
-  ++loopCount;
-  nowTime = micros();
-  if (loopCount > loopCountMax)
-  {     
-      deltaMicros = (float)(nowTime - loopStartTime) / ((float)loopCountMax);
-      loopCount = 0;
-      loopStartTime = nowTime;
-  }
-  if ((nowTime - startTime1Hz) > 1000000)
+
+  if ((int)(nowTime - startTimeButton) > buttonPeriod)
   {
-    startTime1Hz = nowTime;
-    blinky = !blinky;
+    startTimeButton = nowTime;
+    buttonBuffer[buttonBufferPointer[0]] = digitalRead(buttonPin);
+    if ((buttonBuffer[buttonBufferPointer[0]] == HIGH)  && (buttonBuffer[buttonBufferPointer[1]] == LOW) )
+    {
+      ledState = ledState + 1;
+      if (ledState > 2) ledState = 0;
+      if (ledState == 0) analogWrite(ledPin, 0);
+      if (ledState == 2) analogWrite(ledPin, ledValue);
+      printMessage("ledState", intToString(ledState));
+    }
+    for (int ii = 0; ii < 2; ++ii)
+    {
+        ++buttonBufferPointer[ii]; 
+        if (buttonBufferPointer[ii] > 1) buttonBufferPointer[ii]  = 0;
+    }
+  }
+  
+  if ((int)(nowTime - startTimePhotoDet) > photoDetPeriod)
+  {
+    startTimePhotoDet = nowTime;
+    photoDetValue = analogRead(photoDetPin);
+    printMessage("photoDetValue", intToString(photoDetValue));
+  }
+
+  if ((int)(nowTime - startTimeHeartBeat) > heartbeatPeriod)
+  {
+    startTimeHeartBeat = nowTime;
+    heartbeat = !heartbeat;
     led13 = !led13;
     digitalWrite(led13Pin, led13);
-    printMessage("loopTime", floatToString(deltaMicros,2));
-    printMessage("blinky", booleanToString(blinky));
+    printMessage("heartbeat", booleanToString(heartbeat));
   }
 }
 

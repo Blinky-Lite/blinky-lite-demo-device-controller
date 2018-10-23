@@ -25,14 +25,23 @@ int photoDetValue = 0;
 int photoDetPeriod = 1000;
 unsigned long startTimePhotoDet = 0;
 
+const int interruptTestOutPin = 9;
+const int interruptTestInPin = 10;
+const int interruptTestPin = 11;
+boolean interruptTestOutValue = false;
+volatile boolean interruptFlag = false;
 void setup()
 {
   setupCommunications(true, 115200);
+  //Serial.begin(9600);
       
   pinMode(led13Pin, OUTPUT); 
   pinMode(ledPin, OUTPUT); 
   pinMode(buttonPin, INPUT); 
   pinMode(photoDetPin, INPUT); 
+  pinMode(interruptTestOutPin, OUTPUT); 
+  pinMode(interruptTestInPin, INPUT_PULLUP); 
+  pinMode(interruptTestPin, OUTPUT); 
    
   nowTime = millis();
   startTimeHeartBeat = nowTime;
@@ -41,7 +50,7 @@ void setup()
   startTimePhotoDet = nowTime;
   
   if (ledState == 2) analogWrite(ledPin, ledValue);    
-  delay(10);
+  attachInterrupt(interruptTestInPin, interruptTestRising, RISING);
 }
 
 void loop()
@@ -53,12 +62,19 @@ void loop()
     if (getInputTopic().equals("getLedPeriod")) printMessage("ledPeriod", intToString(ledPeriod));
     if (getInputTopic().equals("setLedState"))
     {
-      ledState = stringToInt(getInputTopic());
+      ledState = stringToInt(getInputPayload());
       if (ledState == 0) analogWrite(ledPin, 0);
       if (ledState == 2) analogWrite(ledPin, ledValue);
+      printMessage("ledState", intToString(ledState));
+
     }
-    if (getInputTopic().equals("setLedValue")) ledValue = stringToInt(getInputTopic());
-    if (getInputTopic().equals("setLedPeriod"))ledPeriod = stringToInt(getInputTopic());
+    if (getInputTopic().equals("setLedValue"))
+    {
+      ledValue = stringToInt(getInputPayload());
+      if (ledState == 2) analogWrite(ledPin, ledValue);
+      printMessage("ledValue", intToString(ledValue));
+    }
+    if (getInputTopic().equals("setLedPeriod"))ledPeriod = stringToInt(getInputPayload());
     
   }
   nowTime = millis();
@@ -105,6 +121,7 @@ void loop()
     printMessage("photoDetValue", intToString(photoDetValue));
   }
 
+
   if ((int)(nowTime - startTimeHeartBeat) > heartbeatPeriod)
   {
     startTimeHeartBeat = nowTime;
@@ -113,5 +130,14 @@ void loop()
     digitalWrite(led13Pin, led13);
     printMessage("heartbeat", booleanToString(heartbeat));
   }
+    interruptTestOutValue = !interruptTestOutValue;
+    digitalWrite(interruptTestOutPin, interruptTestOutValue);
+    if (!interruptTestOutValue) digitalWrite(interruptTestPin, LOW);
+
 }
+void interruptTestRising() 
+{
+  digitalWrite(interruptTestPin, HIGH);
+}
+
 

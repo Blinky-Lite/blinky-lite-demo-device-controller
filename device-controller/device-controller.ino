@@ -18,7 +18,7 @@ const int photoDetPin = A0;
 const int photoLedPin = 6;
 int photoDetValue = 0;
 boolean photoLedValue = false;
-int photoDetPeriod = 250;
+int photoDetPeriod = 1000;
 float photoLedPeriod = 250;
 float photoLedPeriodMin = 50;
 float photoLedPeriodMax = 2000;
@@ -33,7 +33,7 @@ float ultraLedValue = 0;
 long ultraDuration = 0;
 int ultraDistance = 0;
 int ultraAlarmDistance = 10;
-int ultraPeriod = 250;
+int ultraPeriod = 1000;
 unsigned long startTimeUltra = 0;
 
 const int interruptTestInPin = 10;
@@ -204,5 +204,3 @@ void interruptTestHandler()
   digitalWrite(interruptTestOutPin, HIGH);
   interruptFlag = true;
 }
-
-

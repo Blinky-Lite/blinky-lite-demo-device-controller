@@ -46,7 +46,7 @@ const int tempPin  = A2;
 int tempPinValue = 0;
 float tempValue = 0.0;
 float tempAvg = 0.0;
-int tempPeriod = 2000;
+int tempPeriod = 1000;
 unsigned long startTimeTemp = 0;
 
 void setup()

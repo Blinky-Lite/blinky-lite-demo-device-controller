@@ -138,7 +138,7 @@ void loop()
     }
     settingsMask.ledPeriod = 0;
   }
-  if (settingsMask.ledPeriod > 0)
+  if (settingsMask.ultraAlarmDistance > 0)
   {
     if((1 <= settings.ultraAlarmDistance) && (settings.ultraAlarmDistance <= 1000))
     {

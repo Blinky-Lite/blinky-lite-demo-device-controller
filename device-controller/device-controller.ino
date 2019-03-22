@@ -11,8 +11,6 @@ const int interruptTestOutPin = 11;
 
 boolean led13 = false;
 unsigned long nowTime;
-int heartbeatPeriod = 1000;
-unsigned long startTimeHeartBeat;
 
 int ledValueToggle = 0;
 unsigned long startTimeLed = 0;
@@ -33,6 +31,8 @@ const int maxInterruptCounts = 500;
 
 int tempPinValue = 0;
 float tempValue = 0.0;
+
+boolean motherShipConnection = false;
 
 struct Readings
 {
@@ -84,16 +84,17 @@ void setup()
   pinMode(tempPin, INPUT);
    
   nowTime = millis();
-  startTimeHeartBeat = nowTime;
   startTimeLed = nowTime;
+  startTimePhotoLed = nowTime;
   readings.tempAvg = 0.0;
   readings.ledState = 1;
   readings.ledValue = 255;
   readings.ledPeriod = 100;
   readings.ultraAlarmDistance = 10;
 
-
   settings.echoSettings = 0;
+  digitalWrite(led13Pin, led13);
+  digitalWrite(photoLedPin, photoLedValue);
   
   if (readings.ledState == 2) analogWrite(ledPin, readings.ledValue);    
   attachInterrupt(interruptTestInPin, interruptTestHandler, HIGH);
@@ -105,10 +106,12 @@ void loop()
   {
     Serial1.readBytes((uint8_t*) &settingsMask,sizeof(settingsMask));
     Serial1.readBytes((uint8_t*) &settings, sizeof(settings));
+    motherShipConnection = true;
   }
   if (settingsMask.echoSettings > 0)
   {
      settingsMask.echoSettings = 0;
+     updateReadings();
      Serial1.write((uint8_t*)&readings, sizeof(readings));
   }
   if (settingsMask.ledState > 0)
@@ -147,7 +150,7 @@ void loop()
     settingsMask.ultraAlarmDistance = 0;
   }
 
-  nowTime = millis();
+  if (motherShipConnection) nowTime = millis();
   if (readings.ledState == 1)
   {
     if ((int)(nowTime - startTimeLed) > readings.ledPeriod)
@@ -178,10 +181,21 @@ void loop()
   tempValue = 2.70 * tempValue;
   readings.tempAvg = readings.tempAvg + (tempValue - readings.tempAvg) / 1000;
  
-
-  if ((int)(nowTime - startTimeHeartBeat) > heartbeatPeriod)
+  if(interruptFlag)
   {
-    startTimeHeartBeat = nowTime;
+    interruptFlag = false;
+    interruptCounter = 0;
+    digitalWrite(interruptTestOutPin, LOW);
+    readings.ledState = readings.ledState + 1;
+    if (readings.ledState > 2) readings.ledState = 0;
+    if (readings.ledState == 0) analogWrite(ledPin, 0);
+    if (readings.ledState == 2) analogWrite(ledPin, readings.ledValue);
+//    printMessage("ledState", intToString(readings.ledState));
+  }
+
+}
+void updateReadings()
+{
     led13 = !led13;
     digitalWrite(led13Pin, led13);
 
@@ -203,22 +217,7 @@ void loop()
     readings.ultraDistance= ultraDuration * 0.034/2;
     ultraLedValue = LOW;
     if (readings.ultraDistance <= readings.ultraAlarmDistance) ultraLedValue = HIGH;
-    digitalWrite(ultraLedPin, ultraLedValue);
-
-
-  }
-  if(interruptFlag)
-  {
-    interruptFlag = false;
-    interruptCounter = 0;
-    digitalWrite(interruptTestOutPin, LOW);
-    readings.ledState = readings.ledState + 1;
-    if (readings.ledState > 2) readings.ledState = 0;
-    if (readings.ledState == 0) analogWrite(ledPin, 0);
-    if (readings.ledState == 2) analogWrite(ledPin, readings.ledValue);
-//    printMessage("ledState", intToString(readings.ledState));
-  }
-
+    digitalWrite(ultraLedPin, ultraLedValue);  
 }
 void interruptTestHandler() 
 {

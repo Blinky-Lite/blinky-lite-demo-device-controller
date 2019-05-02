@@ -1,0 +1,54 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=frizing-design
+*Date=06:57:17
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;;7.79191;-35.6802;0;Bottom;Via25
+2;220;THT;12.872;-38.2202;180;Bottom;R9
+3;;;15.4119;-28.0602;0;Bottom;Via4
+4;10k;THT;12.872;-40.7602;0;Bottom;R2
+5;;photocell-kit;15.9521;-45.8402;0;Bottom;R1
+6;;;30.6519;-10.2803;0;Bottom;Via7
+7;;;15.4119;-12.8203;0;Bottom;Via3
+8;;;15.4119;-2.66028;0;Bottom;Via1
+9;;;30.6519;-22.9803;0;Bottom;Via11
+10;;5 mm [THT];35.7319;-41.4512;0;Bottom;LED1
+11;;;33.1919;-50.9202;0;Bottom;Via15
+12;;;28.1119;-17.9003;0;Bottom;Via21
+13;;;25.5719;-50.9202;0;Bottom;Via17
+14;;;30.6519;-5.20028;0;Bottom;Via5
+15;10k;THT;40.812;-5.20018;0;Bottom;R7
+16;;;30.6519;-33.1402;0;Bottom;Via13
+17;;;15.4119;-33.1402;0;Bottom;Via22
+18;;;30.6519;-20.4403;0;Bottom;Via9
+19;;5 mm [THT];35.7319;-26.2112;0;Bottom;LED3
+20;220;THT;40.812;-30.6002;0;Bottom;R5
+21;;;7.79191;-28.0602;0;Bottom;Via24
+22;;;15.4119;-10.2803;0;Bottom;Via2
+23;;;30.6519;-30.6002;0;Bottom;Via12
+24;;;30.6519;-12.8203;0;Bottom;Via8
+25;;5 mm [THT];35.7319;-18.5912;0;Bottom;LED4
+26;;;7.79179;-21.7105;90;Bottom;hc-sr1
+27;;;7.79191;-33.1402;0;Bottom;Via27
+28;220;THT;40.7722;-45.8403;0;Bottom;R3
+29;220;THT;40.812;-38.2202;0;Bottom;R4
+30;;;7.79191;-30.6002;0;Bottom;Via26
+31;;[THT];43.6418;-12.1102;-90;Bottom;S1
+32;;;30.6519;-2.66028;0;Bottom;Via10
+33;;;40.8119;-50.9202;0;Bottom;Via14
+34;;;15.4119;-7.74028;0;Bottom;Via19
+35;;;23.0319;-45.8402;0;Bottom;Via20
+36;;5 mm [THT];35.7319;-33.8312;0;Bottom;LED2
+37;;;30.6519;-7.74028;0;Bottom;Via6
+38;220;THT;40.812;-22.9802;0;Bottom;R6
+39;;;30.6519;-50.9202;0;Bottom;Via16
